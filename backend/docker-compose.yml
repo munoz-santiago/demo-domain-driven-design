@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0.27
+    container_name: mysql-container
+    platform: linux/amd64  # Specify the platform here
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: mydatabase
+      MYSQL_USER: user
+      MYSQL_PASSWORD: userpassword
+    volumes:
+      - ./mysql-data:/var/lib/mysql  # Persist MySQL data in a local folder
+      - ./my.cnf:/etc/mysql/conf.d/my.cnf  # Mount the custom MySQL configuration file
+    ports:
+      - "3306:3306"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin-container
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: secret
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql
+
+volumes:
+  mysql-data:

@@ -2,15 +2,16 @@ import express from 'express';
 import GetClientById from '../useCases/GetClientById';
 import Client from '../domain/Client';
 import ClientResponseDTO from './ClientResponseDTO';
-import ClientInMemoryRepository from './ClientInMemoryRepository';
 import GetAllClients from '../useCases/GetAllClients';
 import CreateClient from '../useCases/CreateClient';
-// import ClientDBRepository from './ClientDBRepository';
+
+// import ClientInMemoryRepository from './ClientInMemoryRepository';
+import ClientDBRepository from './ClientDBRepository';
 
 const router = express.Router();
 
 router.get('/:id', async (req, res) => {
-    const clientRepo = new ClientInMemoryRepository();
+    const clientRepo = new ClientDBRepository();
     const getClientById = new GetClientById(clientRepo);
     const client: Client = await getClientById.execute(req.params.id);
     const clientDto = ClientResponseDTO.fromEntity(client)
@@ -18,7 +19,7 @@ router.get('/:id', async (req, res) => {
 });
 
 router.get('/', async (req, res) => {
-    const clientRepo = new ClientInMemoryRepository();
+    const clientRepo = new ClientDBRepository();
     const getClientById = new GetAllClients(clientRepo);
     const clients: Client[] = await getClientById.execute();
     const response = clients.map((client) => ClientResponseDTO.fromEntity(client))
@@ -28,7 +29,7 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
     const { id, fullName, email } = req.body || {}
 
-    const clientRepo = new ClientInMemoryRepository();
+    const clientRepo = new ClientDBRepository();
     const createClient = new CreateClient(clientRepo)
     await createClient.execute(id, fullName, email)
 
